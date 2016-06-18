@@ -1,4 +1,4 @@
-case class Heroe(hp: Int, fuerza: Int, velocidad: Int, inteligencia: Int, trabajo: Option[Trabajo], inventario: Inventario) {
+case class Heroe(hp: Int, fuerza: Int, velocidad: Int, inteligencia: Int, var trabajo: Option[Trabajo], inventario: Inventario) {
 
   def heroeConStatsCalculados: Heroe = {
     val modificadores: List[ModificadorStats] = trabajo.toList ::: inventario.itemList
@@ -9,6 +9,9 @@ case class Heroe(hp: Int, fuerza: Int, velocidad: Int, inteligencia: Int, trabaj
   def equiparArmadura(armadura: Armadura): Unit = if(armadura.puedeSerUsado(this)) inventario.equiparArmadura(armadura)
   def equiparItemDeMano(itemDeMano: ItemDeMano): Unit = if(itemDeMano.puedeSerUsado(this)) inventario.equiparItemDeMano(itemDeMano)
   def equiparTalisman(talisman: Talisman): Unit = if(talisman.puedeSerUsado(this)) inventario.equiparTalisman(talisman)
+  def cambiarTrabajo(trabajo: Option[Trabajo]) =
+    this.trabajo = trabajo
+  def incrementoMainStat(item: Item): Integer = ???
 }
 
 
