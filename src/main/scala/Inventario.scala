@@ -1,5 +1,7 @@
 trait Item extends ModificadorStats{
+  val valor:Int = 0 //Hay que overridearlo en cada case object especifico para darle un valor distinto
   def puedeSerUsado(heroe: Heroe): Boolean
+  def vender:Int = valor
 }
 
 trait Casco extends Item
@@ -11,6 +13,7 @@ trait ItemDeMano extends Item{
 }
 
 case object CascoVikingo extends Casco{
+
   override def puedeSerUsado(heroe: Heroe): Boolean = heroe.stats.fuerza > 30
 
   override def modificarStats(stats: Stats, heroe: Heroe): Stats =
