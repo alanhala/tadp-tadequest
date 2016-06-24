@@ -5,7 +5,7 @@ case object Fuerza extends StatPrincipal
 case object Velocidad extends StatPrincipal
 case object Inteligencia extends StatPrincipal
 
-case class Trabajo(statPrincipal: StatPrincipal, modificadores: Stats) extends ModificadorStats{
+class Trabajo(var statPrincipal: StatPrincipal, var modificadores: Stats) extends ModificadorStats{
 
   override def modificarStats(stats: Stats, heroe: Heroe): Stats =
     stats.copy(hp = 1.max(stats.hp + modificadores.hp),
