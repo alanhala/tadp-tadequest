@@ -3,9 +3,9 @@ import scala.util.Try
 /**
   * Created by alanhala on 6/18/16.
   */
-class Equipo(var oro: Integer, nombre: String, var heroes: List[Heroe]) {
+case class Equipo(oro: Integer, nombre: String, heroes: List[Heroe]) {
 
-  def mejorHeroeSegun(criterio: Heroe => Integer): Option[Heroe] =
+  def mejorHeroeSegun(criterio: Heroe => Int): Option[Heroe] =
     Try(heroes.maxBy(criterio(_))).toOption
 
   def obtenerItem(item: Item) = {
@@ -16,10 +16,10 @@ class Equipo(var oro: Integer, nombre: String, var heroes: List[Heroe]) {
   }
 
   def agregarMiembro(heroe: Heroe) =
-    this.heroes = heroe :: this.heroes
+    this.copy(heroes = heroe :: this.heroes)
 
-  def reemplazarMiembro(heroe: Heroe) =
-    this.heroes = heroe :: this.heroes.dropRight(1)
+  def reemplazarMiembro(heroe: Option[Heroe], nuevoHeroe: Option[Heroe]) =
+    this.copy(heroes = nuevoHeroe.toList ::: heroes.filterNot(_ == heroe))
 
   def lider:Option[Heroe] = {
     mejorHeroeSegun(heroe=>heroe.valorStatPrincipal) match {
@@ -27,5 +27,4 @@ class Equipo(var oro: Integer, nombre: String, var heroes: List[Heroe]) {
       case _ => None
     }
   }
-
 }
