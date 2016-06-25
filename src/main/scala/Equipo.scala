@@ -1,8 +1,5 @@
 import scala.util.Try
 
-/**
-  * Created by alanhala on 6/18/16.
-  */
 case class Equipo(oro: Integer, nombre: String, heroes: List[Heroe]) {
 
   def mejorHeroeSegun(criterio: Heroe => Int): Option[Heroe] =
@@ -15,11 +12,15 @@ case class Equipo(oro: Integer, nombre: String, heroes: List[Heroe]) {
     }
   }
 
-  def agregarMiembro(heroe: Heroe) =
+  def agregarMiembro(heroe: Heroe): Equipo =
     this.copy(heroes = heroe :: this.heroes)
 
-  def reemplazarMiembro(heroe: Option[Heroe], nuevoHeroe: Option[Heroe]) =
-    this.copy(heroes = nuevoHeroe.toList ::: heroes.filterNot(_ == heroe))
+  def quitarMiembro(heroe: Heroe): Equipo =
+    this.copy(heroes = this.heroes.filter(h => h != heroe))
+
+  def remplazar(heroeViejo: Heroe, heroeNuevo: Heroe): Equipo =
+    this.quitarMiembro(heroeViejo).agregarMiembro(heroeNuevo)
+  
 
   def lider:Option[Heroe] = {
     mejorHeroeSegun(heroe=>heroe.valorStatPrincipal) match {
