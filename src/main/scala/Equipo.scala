@@ -1,15 +1,17 @@
 import scala.util.Try
 
-case class Equipo(oro: Integer, nombre: String, heroes: List[Heroe]) {
+case class Equipo(oro: Int, nombre: String, heroes: List[Heroe]) {
 
   def mejorHeroeSegun(criterio: Heroe => Int): Option[Heroe] =
     Try(heroes.maxBy(criterio(_))).toOption
 
-  def obtenerItem(item: Item) = {
-    mejorHeroeSegun(heroe=>heroe.incrementoMainStat(item)) match{
-      case Some(heroe) if(heroe.incrementoMainStat(item)>0) => heroe.equiparItem(item)
-      case _  => oro.+=(item.vender)
-    }
+  def obtenerItem(item: Item): Equipo = {
+    val mejorHeroeParaItem = mejorHeroeSegun(heroe=>heroe.incrementoMainStat(item))
+
+    if(mejorHeroeParaItem.exists(h => h.incrementoMainStat(item) > 0))
+      this.remplazar(mejorHeroeParaItem.get, mejorHeroeParaItem.get.equiparItem(item))
+    else
+      this.copy(oro = oro + item.valor)
   }
 
   def agregarMiembro(heroe: Heroe): Equipo =
@@ -22,10 +24,30 @@ case class Equipo(oro: Integer, nombre: String, heroes: List[Heroe]) {
     this.quitarMiembro(heroeViejo).agregarMiembro(heroeNuevo)
   
 
-  def lider:Option[Heroe] = {
-    mejorHeroeSegun(heroe=>heroe.valorStatPrincipal) match {
-      case Some(heroe) if(heroes.filter(heroe2=>heroe2.valorStatPrincipal==heroe.valorStatPrincipal).size==1) => Option(heroe)
-      case _ => None
-    }
+  def lider: Option[Heroe] = {
+    val posibleLider = mejorHeroeSegun(heroe => heroe.valorStatPrincipal)
+
+    posibleLider.fold[Option[Heroe]](None)(pl => {
+      if(heroes.exists(h => h.valorStatPrincipal == pl.valorStatPrincipal && h != pl)) None else posibleLider
+    })
   }
+}
+
+
+trait EstadoEquipo {
+  val falloEnMision: Boolean
+
+  def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo
+}
+
+case class EquipoEnAccion(equipo: Equipo) extends EstadoEquipo {
+  override  val falloEnMision = false
+
+  def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = f(equipo)
+}
+
+case class EquipoFallido(equipo: Equipo, tareaFallida: Tarea) extends EstadoEquipo {
+  override  val falloEnMision = true
+
+  def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = this
 }

@@ -1,12 +1,7 @@
-import scala.util.Try
-import scala.util.Success
-
-
 class Mision(tareas: List[Tarea]) {
 
-  def serRealizada(equipo: Equipo): Try[Equipo] =
-    tareas.foldLeft(Try(equipo)) ( (equipoAntes, tareaActual) => equipoAntes.flatMap(e => tareaActual.serRealizadaPor(e)) )
-
+  def serRealizada(equipo: Equipo): EstadoEquipo =
+    tareas.foldLeft[EstadoEquipo](EquipoEnAccion(equipo)) ( (equipoAntes, tareaActual) => equipoAntes.flatMap(e => tareaActual.serRealizadaPor(e)) )
 }
 
 
@@ -20,16 +15,12 @@ class Tarea(val descripcion: String,
     equipo.mejorHeroeSegun { heroe => this.facilidad(heroe, equipo) }
 
 
-  def serRealizadaPor(equipo: Equipo): Try[Equipo] = {
+  def serRealizadaPor(equipo: Equipo): EstadoEquipo = {
       val mejorHeroe = this.mejorHeroeParaTarea(equipo)
 
-      mejorHeroe match{
-        case Some(heroe) => {
-          val equipoConHeroeModificado = equipo.remplazar(heroe, this.modificarHeroe(heroe))
-          Success(this.recompensa(equipoConHeroeModificado))
-        }
-
-        case None => throw new Exception("Fallé en la tarea " + this.descripcion)
-      }
+      mejorHeroe.fold[EstadoEquipo](EquipoFallido(equipo, this))(heroe => {
+        val equipoConHeroeModificado = equipo.remplazar(heroe, this.modificarHeroe(heroe))
+        EquipoEnAccion(this.recompensa(equipoConHeroeModificado))
+      })
     }
 }

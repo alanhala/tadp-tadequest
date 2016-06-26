@@ -1,7 +1,6 @@
 trait Item extends ModificadorStats{
-  val valor:Int = 0 //Hay que overridearlo en cada case object especifico para darle un valor distinto
+  val valor: Int = 0 //Hay que overridearlo en cada case object especifico para darle un valor distinto
   def puedeSerUsado(heroe: Heroe): Boolean
-  def vender:Int = valor
 }
 
 trait Casco extends Item
@@ -114,25 +113,25 @@ case object EspadaDeLaVida extends ItemDeMano{
 }
 
 
-class Inventario (var cabeza: Option[Casco],
-                  var torso: Option[Armadura],
-                  var manos: List[ItemDeMano] = List(),
-                  var talismanes: List[Talisman] = List())
+case class Inventario (cabeza: Option[Casco],
+                                     torso: Option[Armadura],
+                                     manos: List[ItemDeMano] = List(),
+                                     talismanes: List[Talisman] = List())
 {
   def itemList: List[Item] =
     cabeza.toList ::: torso.toList ::: manos ::: talismanes
 
 
-  def equiparCasco(casco: Casco): Unit = cabeza = Some(casco)
-  def equiparArmadura(armadura: Armadura): Unit = torso = Some(armadura)
-  def equiparTalisman(talisman: Talisman): Unit = talismanes = talisman :: talismanes
+  def equiparCasco(casco: Casco): Inventario = this.copy(cabeza = Some(casco))
+  def equiparArmadura(armadura: Armadura): Inventario = this.copy(torso = Some(armadura))
+  def equiparTalisman(talisman: Talisman): Inventario = this.copy(talismanes = talisman :: talismanes)
 
-  def equiparItemDeMano(item: ItemDeMano): Unit = {
+  def equiparItemDeMano(item: ItemDeMano): Inventario = {
     if(item.usaDosManos || manos.exists(i => i.usaDosManos))
-      manos = List(item)
+      this.copy(manos = List(item))
     else if(manos.size <= 1)
-      manos = item :: manos
+      this.copy(manos = item :: manos)
     else
-      manos = List(manos.head, item)
+      this.copy(manos = List(manos.head, item))
   }
 }
