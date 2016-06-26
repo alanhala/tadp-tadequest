@@ -2,17 +2,13 @@ case class Taberna(tablon: List[Mision]) {
 
   def mejorMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Option[Mision] = {
 
-    tablon.foldLeft[Option[Mision]]((mejorMision: Option[Mision], misionActual: Mision) => {
+    tablon.filter(m => !m.serRealizada(equipo).falloEnMision)
+              .foldLeft[Option[Mision]](None)((mejorMision, misionActual) => {
 
+                mejorMision.fold[Option[Mision]](Some(misionActual))(m =>
+                  if(criterio(m.serRealizada(equipo).get, misionActual.serRealizada(equipo).get)) mejorMision else Some(misionActual)
+                )
     })
-
-    /*Try(tablon.filter(m => m.serRealizada(equipo).isSuccess)
-                      .reduce[Mision]((misionAnterior, misionActual) => {
-                        if(criterio(misionAnterior.serRealizada(equipo).get, misionActual.serRealizada(equipo).get))
-                          misionAnterior
-                        else
-                          misionActual
-              }))*/
   }
 
 

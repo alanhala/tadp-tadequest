@@ -37,17 +37,23 @@ case class Equipo(oro: Int, nombre: String, heroes: List[Heroe]) {
 trait EstadoEquipo {
   val falloEnMision: Boolean
 
+  def get: Equipo
+
   def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo
 }
 
 case class EquipoEnAccion(equipo: Equipo) extends EstadoEquipo {
   override  val falloEnMision = false
 
-  def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = f(equipo)
+  override def get: Equipo = equipo
+
+  override def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = f(equipo)
 }
 
 case class EquipoFallido(equipo: Equipo, tareaFallida: Tarea) extends EstadoEquipo {
   override  val falloEnMision = true
 
-  def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = this
+  override def get: Equipo = equipo
+
+  override def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = this
 }
