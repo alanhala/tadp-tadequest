@@ -1,32 +1,36 @@
 case class Taberna(tablon: List[Mision]) {
 
-  def mejorMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Option[Mision] = {
+  def mejorMision(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Option[Mision] =
+    this.mejorMisionDeLista(equipo, tablon, criterio)
 
-    tablon.filter(m => !m.serRealizada(equipo).falloEnMision)
-              .foldLeft[Option[Mision]](None)((mejorMision, misionActual) => {
 
-                mejorMision.fold[Option[Mision]](Some(misionActual))(m =>
-                  if(criterio(m.serRealizada(equipo).get, misionActual.serRealizada(equipo).get)) mejorMision else Some(misionActual)
-                )
+  def mejorMisionDeLista(equipo: Equipo, misionLista: List[Mision], criterio: (Equipo, Equipo) => Boolean): Option[Mision] = {
+
+    misionLista.filter(m => !m.serRealizada(equipo).falloEnMision)
+      .foldLeft[Option[Mision]](None)((mejorMision, misionActual) => {
+
+      mejorMision.fold[Option[Mision]](Some(misionActual))(m =>
+        if(criterio(m.serRealizada(equipo).get, misionActual.serRealizada(equipo).get)) mejorMision else Some(misionActual)
+      )
     })
   }
 
 
-  def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): Equipo = {
+  def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): EstadoEquipo = {
 
-    var equipoNuevo = equipo
-    var proximaMision: Try[Mision] = this.mejorMision(equipo, criterio)
-    var taberna: Taberna = this
+    var listaMisiones = tablon
+    var estadoEquipo: EstadoEquipo = EquipoEnAccion(equipo)
+    var proximaMision = this.mejorMisionDeLista(equipo, listaMisiones, criterio)
 
-    while(proximaMision.isSuccess){
-      equipoNuevo = proximaMision.get.serRealizada(equipoNuevo).get
+    while(proximaMision.nonEmpty){
+      estadoEquipo = proximaMision.get.serRealizada(estadoEquipo.get)
 
-      taberna = taberna.copy(tablon = taberna.tablon.filter(m => m != proximaMision.get))
+      listaMisiones = listaMisiones.filter(m => m != proximaMision.get)
 
-      proximaMision = taberna.mejorMision(equipoNuevo, criterio)
+      proximaMision = this.mejorMisionDeLista(estadoEquipo.get, listaMisiones, criterio)
     }
 
-    equipoNuevo
+    estadoEquipo
   }
 
 }
