@@ -18,19 +18,14 @@ case class Taberna(tablon: List[Mision]) {
 
   def entrenar(equipo: Equipo, criterio: (Equipo, Equipo) => Boolean): EstadoEquipo = {
 
-    var listaMisiones = tablon
-    var estadoEquipo: EstadoEquipo = EquipoEnAccion(equipo)
-    var proximaMision = this.mejorMisionDeLista(equipo, listaMisiones, criterio)
+    val criterioMision: (Mision, Mision) => Boolean =
+      (mision1, mision2) =>   criterio(mision1.serRealizada(equipo).get, mision2.serRealizada(equipo).get)
 
-    while(proximaMision.nonEmpty){
-      estadoEquipo = proximaMision.get.serRealizada(estadoEquipo.get)
+    val misionesOrdenadas = tablon.filter(m => !m.serRealizada(equipo).falloEnMision).sortWith(criterioMision)
 
-      listaMisiones = listaMisiones.filter(m => m != proximaMision.get)
-
-      proximaMision = this.mejorMisionDeLista(estadoEquipo.get, listaMisiones, criterio)
-    }
-
-    estadoEquipo
+    misionesOrdenadas.foldLeft[EstadoEquipo](EquipoEnAccion(equipo))((estadoEquipo, misionActual) => {
+      estadoEquipo.fold[EstadoEquipo](estadoEquipo)(e => misionActual.serRealizada(e))
+    })
   }
 
 }

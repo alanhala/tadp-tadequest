@@ -40,6 +40,7 @@ trait EstadoEquipo {
   def get: Equipo
 
   def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo
+  def fold[B](ifEmpty: B)(f: Equipo => B): B
 }
 
 case class EquipoEnAccion(equipo: Equipo) extends EstadoEquipo {
@@ -48,6 +49,8 @@ case class EquipoEnAccion(equipo: Equipo) extends EstadoEquipo {
   override def get: Equipo = equipo
 
   override def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = f(equipo)
+
+  override def fold[B](ifEmpty: B)(f: Equipo => B): B = f(equipo)
 }
 
 case class EquipoFallido(equipo: Equipo, tareaFallida: Tarea) extends EstadoEquipo {
@@ -56,4 +59,6 @@ case class EquipoFallido(equipo: Equipo, tareaFallida: Tarea) extends EstadoEqui
   override def get: Equipo = equipo
 
   override def flatMap(f: (Equipo => EstadoEquipo)): EstadoEquipo = this
+
+  override def fold[B](ifEmpty: B)(f: Equipo => B): B = ifEmpty
 }
