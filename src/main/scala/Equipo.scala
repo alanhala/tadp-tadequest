@@ -8,7 +8,6 @@ case class Equipo(oro: Int, nombre: String, heroes: List[Heroe]) {
   def obtenerItem(item: Item): Equipo = {
     val mejorHeroeParaItem = mejorHeroeSegun(heroe=>heroe.incrementoMainStat(item))
     var heroeClonado:Heroe = mejorHeroeParaItem.get.copy().equiparItem(item)
-
     if(mejorHeroeParaItem.get.incrementoMainStat(item)>0){
       this.quitarMiembro(mejorHeroeParaItem.get)
       this.agregarMiembro(heroeClonado)
@@ -25,7 +24,7 @@ case class Equipo(oro: Int, nombre: String, heroes: List[Heroe]) {
 
   def remplazar(heroeViejo: Heroe, heroeNuevo: Heroe): Equipo =
     this.quitarMiembro(heroeViejo).agregarMiembro(heroeNuevo)
-  
+
 
   def lider: Option[Heroe] = {
     val posibleLider = mejorHeroeSegun(heroe => heroe.valorStatPrincipal)
