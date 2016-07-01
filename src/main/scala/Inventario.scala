@@ -97,6 +97,8 @@ case object VinchaDelBufaloDeAgua extends Casco{
 }
 
 case object TalismanMaldito extends Talisman{
+  override val valor: Int = 5
+
   override def puedeSerUsado(heroe: Heroe): Boolean = true
 
   override def modificarStats(stats: Stats, heroe: Heroe): Stats =

@@ -7,9 +7,12 @@ case class Equipo(oro: Int, nombre: String, heroes: List[Heroe]) {
 
   def obtenerItem(item: Item): Equipo = {
     val mejorHeroeParaItem = mejorHeroeSegun(heroe=>heroe.incrementoMainStat(item))
+    var heroeClonado:Heroe = mejorHeroeParaItem.get.copy().equiparItem(item)
 
-    if(mejorHeroeParaItem.exists(h => h.incrementoMainStat(item) > 0))
-      this.remplazar(mejorHeroeParaItem.get, mejorHeroeParaItem.get.equiparItem(item))
+    if(mejorHeroeParaItem.get.incrementoMainStat(item)>0){
+      this.quitarMiembro(mejorHeroeParaItem.get)
+      this.agregarMiembro(heroeClonado)
+    }
     else
       this.copy(oro = oro + item.valor)
   }
