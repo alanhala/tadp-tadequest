@@ -1,4 +1,4 @@
-case class Heroe(stats: Stats,  var trabajo: Option[Trabajo], inventario: Inventario) {
+case class Heroe(stats: Stats, trabajo: Option[Trabajo], inventario: Inventario) {
 
   def statsFinales: Stats = {
     val modificadores: List[ModificadorStats] = trabajo.toList ::: inventario.itemList
@@ -33,7 +33,7 @@ case class Heroe(stats: Stats,  var trabajo: Option[Trabajo], inventario: Invent
   }
 
   def cambiarTrabajo(trabajo: Option[Trabajo]): Heroe ={
-    this.copy(trabajo=trabajo)
+    this.copy(trabajo = trabajo)
   }
 
   def incrementoMainStat(item: Item): Int = {
